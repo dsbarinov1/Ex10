@@ -1,57 +1,69 @@
 // Copyright 2020 DBarinov
 #include "postfix.h"
-#include "MyStack.h"
-#include <string>
-bool isOperator(char c) {
-    return (!isalpha(c) && !isdigit(c));
-}
-int getPriority(char C) {
-    if (C == '-' || C == '+')
-        return 1;
-    else if (C == '*' || C == '/')
-        return 2;
-    else if (C == '^')
-        return 3;
-    return 0;
-}
-std::string infix2postfix(std::string inf) {
-    inf = '(' + inf + ')';
-    int l = inf.size();
-    MyStack<char> char_stack(l);
-    std::string output;
-    for (int i = 0; i < l; i++) {
-        if (inf[i] != ' ') {
-            if (isdigit(inf[i])) {
-                output += inf[i];
-                output += " ";
-            } else if (inf[i] == '.') {
-                output = output.substr(0, output.size() - 1);
-                output += inf[i];
-            } else if (output[output.size()] == '.') {
-                output += inf[i];
-                output += " ";
-            } else if (inf[i] == '(') {
-                char_stack.push('(');
-            } else if (inf[i] == ')') {
-                while (char_stack.get() != '(') {
-                    output += char_stack.get();
-                    output += " ";
-                    char_stack.pop();
-                }
-                char_stack.pop();
-            } else {
-                if (isOperator(char_stack.get())) {
-                    while (getPriority(inf[i])
-                        <= getPriority(char_stack.get())) {
-                        output += char_stack.get();
-                        output += " ";
-                        char_stack.pop();
-                    }
-                    char_stack.push(inf[i]);
-                }
-            }
+
+std::string infix2postfix(std::string infix) {
+  std::string postfix;
+  Stack<char> stack(200);
+  int i = 0;
+  while (i < infix.size()) {
+    if (infix[i] == '(') {
+      stack.push(infix[i++]);
+    } else {
+      if (infix[i] == ')') {
+        while (!stack.isEmpty() && stack.get() != '(') {
+          postfix += stack.pop();
+          postfix += ' ';
         }
+        if (stack.get() == '(') stack.pop();
+        ++i;
+      } else {
+        if (infix[i] == '*' ||
+            infix[i] == '/') {
+          if (stack.get() == '/' ||
+            stack.get() == '*' ||
+            stack.get() == ')') {
+            while (!stack.isEmpty() &&
+              stack.get() != '(' &&
+              stack.get() != '+' &&
+              stack.get() != '-') {
+              postfix += stack.pop();
+              postfix += ' ';
+            }
+            if (stack.get() == '(') stack.pop();
+            stack.push(infix[i++]);
+          } else {
+            stack.push(infix[i++]);
+          }
+        } else {
+          if (infix[i] == '+' ||
+            infix[i] == '-') {
+            while (!stack.isEmpty() &&
+              stack.get() != '(') {
+              postfix += stack.pop();
+              postfix += ' ';
+            }
+            if (stack.get() == '(') stack.pop();
+            stack.push(infix[i++]);
+          } else {
+            if (infix[i] != ' ') {
+              while (infix[i] >= '0' &&
+                infix[i] <= '9' ||
+                infix[i] == '.') {
+                postfix += infix[i++];
+              }
+              postfix += ' ';
+            } else {
+              i++;
+            }
+          }
+        }
+      }
     }
-    output = output.substr(0, output.size() - 1);
-    return output;
+  }
+  while (!stack.isEmpty()) {
+    postfix += stack.pop();
+    postfix += ' ';
+  }
+  postfix.erase(postfix.size() - 1);
+  return postfix;
 }
