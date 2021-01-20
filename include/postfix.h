@@ -1,8 +1,9 @@
-// Copyright 2020 A.SHT
+// Copyright 2020 DBarinov
 #ifndef INCLUDE_POSTFIX_H_
 #define INCLUDE_POSTFIX_H_
+#include <iostream>
 #include <string>
-
+bool isOperator(char c);
+int getPriority(char C);
 std::string infix2postfix(std::string infix);
-
 #endif  // INCLUDE_POSTFIX_H_
