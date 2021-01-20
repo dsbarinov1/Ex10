@@ -2,69 +2,58 @@
 #ifndef INCLUDE_MYSTACK_H_
 #define INCLUDE_MYSTACK_H_
 
-template<class T>
 #include <iostream>
-#include <string>
-template <class T>
-class MyStack {
-};
 
+template <class T>
+class Stack {
  private:
-    T* stack;
-    int size;
-    int position = 0;
+  T* stack;
+  size_t size;
+  int top;
 
  public:
-    explicit MyStack(int size_) {
-        size = size_;
-        stack = new T[size];
-    }
-
-    MyStack(const MyStack& st) {
-        size = st.size;
-        stack = new T[size];
-        memcpy(stack, st.stack, size);
-        position = st.position;
-    }
-
-    ~MyStack() {
-        delete[] stack;
-    }
-
-    T& get() {
-        int position_ = position - 1;
-        return stack[position_];
-    }
-
-    int getSize() {
-        return size;
-    }
-
-    T& pop() {
-        position--;
-        return stack[position];
-    }
-
-    void push(double x) {
-        if (position < size) {
-            stack[position] = x;
-            position++;
-        } else if (position == size) {}
-    }
-
-    bool isFull() {
-        if (position == size) {
-            return true;
-        }
-        return false;
-    }
-
-    bool isEmpty() {
-        if (position == 0) {
-            return true;
-        }
-        return false;
-    }
+  explicit Stack(size_t);
+  Stack(const Stack&);
+  ~Stack() { delete[] stack; }
+  T get() const;
+  T pop();
+  void push(T);
+  bool isFull() const;
+  bool isEmpty() const;
 };
-
+template <class T>
+Stack<T>::Stack(size_t _size) {
+  stack = new T[_size];
+  size = _size;
+  top = -1;
+}
+template <class T>
+Stack<T>::Stack(const Stack& _myStack) {
+  stack = new T[_myStack.size];
+  size = _myStack.size;
+  top = _myStack.top;
+  for (int i = 0; i <= top; ++i) {
+    stack[i] = _myStack.stack[i];
+  }
+}
+template <class T>
+T Stack<T>::get() const {
+  if (!this->isEmpty()) return this->stack[top];
+}
+template <class T>
+T Stack<T>::pop() {
+  if (!this->isEmpty()) return this->stack[this->top--];
+}
+template <class T>
+void Stack<T>::push(T elem) {
+  if (!this->isFull()) this->stack[++this->top] = elem;
+}
+template <class T>
+bool Stack<T>::isEmpty() const {
+  return (top == -1);
+}
+template <class T>
+bool Stack<T>::isFull() const {
+  return (top == size - 1);
+}
 #endif  // INCLUDE_MYSTACK_H_
